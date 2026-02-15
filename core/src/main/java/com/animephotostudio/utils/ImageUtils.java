@@ -27,4 +27,15 @@ public class ImageUtils {
             g.dispose();
         }
     }
+
+    public static BufferedImage copy(BufferedImage src) {
+        BufferedImage copy = new BufferedImage(src.getWidth(), src.getHeight(), src.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : src.getType());
+        Graphics2D g = copy.createGraphics();
+        try {
+            g.drawImage(src, 0, 0, null);
+        } finally {
+            g.dispose();
+        }
+        return copy;
+    }
 }

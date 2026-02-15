@@ -11,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
+import javafx.concurrent.Task;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -26,6 +27,7 @@ public class MainController {
     @FXML private Button applyBtn;
     @FXML private Button exportBtn;
     @FXML private Label licenseLabel;
+    @FXML private Label statusLabel;
 
     private BufferedImage originalImage;
     private BufferedImage processedImage;
@@ -34,7 +36,16 @@ public class MainController {
 
     @FXML
     public void initialize() {
+        statusLabel.setText("Listo");
+        applyBtn.setDisable(true);
+        exportBtn.setDisable(true);
         updateLicenseLabel();
+    }
+
+    private void updateControls() {
+        applyBtn.setDisable(originalImage == null);
+        exportBtn.setDisable(processedImage == null);
+        licenseLabel.setText(licenseManager.isPro() ? "PRO" : "FREE");
     }
 
     @FXML
@@ -55,8 +66,40 @@ public class MainController {
     @FXML
     private void onApply() {
         if (originalImage == null) return;
-        processedImage = processor.applyAnimeEffect(originalImage);
-        processedView.setImage(SwingFXUtils.toFXImage(processedImage, null));
+        // run processing off the FX thread
+        applyBtn.setDisable(true);
+        loadBtn.setDisable(true);
+        statusLabel.setText("Procesando...");
+
+        Task<BufferedImage> task = new Task<>() {
+            @Override
+            protected BufferedImage call() throws Exception {
+                return processor.applyAnimeEffect(originalImage);
+            }
+        };
+
+        task.setOnSucceeded(evt -> {
+            processedImage = task.getValue();
+            // show preview (watermarked for FREE) without mutating processedImage
+            BufferedImage preview = ImageUtils.copy(processedImage);
+            if (!licenseManager.isPro()) {
+                ImageUtils.applyWatermark(preview, "AnimePhoto Studio • FREE (preview)");
+            }
+            processedView.setImage(SwingFXUtils.toFXImage(preview, null));
+            statusLabel.setText("Listo");
+            loadBtn.setDisable(false);
+            updateControls();
+        });
+
+        task.setOnFailed(evt -> {
+            statusLabel.setText("Error al procesar");
+            loadBtn.setDisable(false);
+            updateControls();
+        });
+
+        Thread t = new Thread(task, "imgproc");
+        t.setDaemon(true);
+        t.start();
     }
 
     @FXML
@@ -67,7 +110,8 @@ public class MainController {
         File f = chooser.showSaveDialog(originalView.getScene().getWindow());
         if (f == null) return;
         try {
-            BufferedImage toSave = processedImage;
+            // copy so watermark doesn't mutate the in-memory processedImage
+            BufferedImage toSave = com.animephotostudio.utils.ImageUtils.copy(processedImage);
             if (!licenseManager.isPro()) {
                 ImageUtils.applyWatermark(toSave, "AnimePhoto Studio • FREE");
             }
@@ -121,5 +165,13 @@ public class MainController {
 
     private void updateLicenseLabel() {
         licenseLabel.setText(licenseManager.isPro() ? "PRO" : "FREE");
+        updateControls();
+        if (processedImage != null) {
+            BufferedImage preview = ImageUtils.copy(processedImage);
+            if (!licenseManager.isPro()) {
+                ImageUtils.applyWatermark(preview, "AnimePhoto Studio • FREE (preview)");
+            }
+            processedView.setImage(SwingFXUtils.toFXImage(preview, null));
+        }
     }
 }

@@ -21,6 +21,6 @@
         </SplitPane>
     </center>
     <bottom>
-        <Label text="Barra de estado: listo" style="-fx-padding:8;" />
+        <Label fx:id="statusLabel" text="Listo" style="-fx-padding:8;" />
     </bottom>
 </BorderPane>

@@ -1,0 +1,5 @@
+com\animephotostudio\utils\ImageUtils.class
+com\animephotostudio\licensing\LicenseManager.class
+module-info.class
+com\animephotostudio\config\AppConfig.class
+com\animephotostudio\core\ImageProcessor.class

@@ -1,0 +1,85 @@
+name: CI — tests & packaging
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test-core:
+    name: Test (core)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Cache Maven local repo
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-m2-
+      - name: Run unit tests (core)
+        run: mvn -B -pl core test
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: core-test-results
+          path: core/target/surefire-reports || core/target
+
+  package-windows:
+    name: Build & package (Windows)
+    runs-on: windows-latest
+    needs: test-core
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Cache Maven
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: windows-m2-${{ hashFiles('**/pom.xml') }}
+      - name: Build app
+        run: mvn -B -am -pl app package -DskipTests
+      - name: jpackage (Windows) via badass-jlink
+        run: mvn -B -am -pl app -Pjpackage org.beryx:badass-jlink-plugin:2.25.0:jpackage
+      - name: Upload Windows installers
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installers
+          path: app/target/jpackage || app/target
+
+  package-macos:
+    name: Build & package (macOS)
+    runs-on: macos-latest
+    needs: test-core
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Cache Maven
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: macos-m2-${{ hashFiles('**/pom.xml') }}
+      - name: Build app
+        run: mvn -B -am -pl app package -DskipTests
+      - name: jpackage (macOS) via badass-jlink
+        run: mvn -B -am -pl app -Pjpackage org.beryx:badass-jlink-plugin:2.25.0:jpackage
+      - name: Upload macOS installers
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-installers
+          path: app/target/jpackage || app/target

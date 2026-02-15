@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox spacing="8" padding="12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.animephotostudio.ui.LicenseInfoController">
+    <Label text="Información de licencia" style="-fx-font-size:16px; -fx-font-weight:bold;" />
+    <GridPane hgap="8" vgap="6">
+        <Label text="Tipo:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+        <Label fx:id="typeLabel" text="FREE" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+        <Label text="Emitida:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+        <Label fx:id="issuedLabel" text="N/A" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+        <Label text="Archivo:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+        <Label fx:id="pathLabel" text="-" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+    </GridPane>
+    <Label fx:id="statusLabel" textFill="-fx-text-fill: red;" />
+    <HBox spacing="8" alignment="CENTER_RIGHT">
+        <Region HBox.hgrow="ALWAYS" />
+        <Button fx:id="deactivateBtn" text="Desactivar" onAction="#onDeactivate" />
+        <Button fx:id="closeBtn" text="Cerrar" onAction="#onClose" />
+    </HBox>
+</VBox>

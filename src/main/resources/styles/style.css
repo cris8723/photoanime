@@ -1,0 +1,13 @@
+/* Minimal, modern look for MVP */
+.root {
+    -fx-font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+.tool-bar {
+    -fx-background-color: linear-gradient(#f8f8f8, #efefef);
+}
+.button {
+    -fx-padding: 8 12 8 12;
+}
+.image-view {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);
+}

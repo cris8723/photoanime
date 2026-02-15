@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox spacing="8" padding="12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.animephotostudio.ui.ActivateController">
+    <Label text="Activar licencia" style="-fx-font-size:16px; -fx-font-weight:bold;" />
+    <Label text="Introduce tu código de activación (PRO)" />
+    <TextField fx:id="keyField" promptText="PRO-DEMO-0001" />
+    <Label fx:id="statusLabel" textFill="red" />
+    <HBox spacing="8" alignment="CENTER_RIGHT">
+        <Region HBox.hgrow="ALWAYS" />
+        <Button fx:id="cancelBtn" text="Cancelar" onAction="#onCancel" />
+        <Button fx:id="activateBtn" text="Activar" onAction="#onActivateKey" />
+    </HBox>
+</VBox>

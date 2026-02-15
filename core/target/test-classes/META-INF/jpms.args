@@ -1,0 +1,4 @@
+--patch-module
+com.animephotostudio.core=_
+--add-reads
+com.animephotostudio.core=ALL-UNNAMED
